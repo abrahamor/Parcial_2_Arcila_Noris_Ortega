@@ -9,7 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { useChangeState } from '../hooks/useChangeState';
 import { authReducer, initialStateLock, LoginPayload } from '../imports/reduce';
-
+import UserCard from './UserCard';
 
 const Main = () => {
 
@@ -191,6 +191,7 @@ const Main = () => {
           {!loading && !errors && !token && <Text style={{color:'green'}}>{message}</Text>}
           {!loading && !errors && !token && <Text>Estado: bloqueado</Text>}
           {!loading && token   && <Text>Estado: desbloqueado</Text>}
+	  <UserCard nombre = {lock ? nombre  : userName} puesto={lock ? cargo  : puesto == 0 ? '' : puesto} correo={lock ?  correo : email} cel={lock ?  cel : telefono} date={lock ? fecha_stat : fecha == 'Fecha de nacimiento' ? '' : fecha} bg_photo={bg_photo} pf_photo={lock ? img : image}/> 
         </View> 
       </ScrollView>
     </EmployeeContext.Provider>

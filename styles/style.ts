@@ -11,6 +11,51 @@ export const styles = StyleSheet.create({
     father:{
       maxHeight:500
     },
+    textContainer:{
+      backgroundColor: 'white',
+      borderColor:'thistle',
+      borderRadius:15,
+    },
+    top:{
+      padding:10,
+      flexWrap:'wrap',
+      flexDirection:'row',
+    }, 
+    bottom:{
+      marginTop:5,
+      flexWrap:'wrap',
+      flexDirection:'row',
+    },
+    text:{
+      fontSize:20,
+      color:'white',
+      textShadowColor:'#585858',
+      textShadowOffset:{width:1,height:1},
+      textShadowRadius:5
+    },
+    text_name:{
+      fontSize:25,
+      color:'white',
+      textShadowColor:'#585858',
+      textShadowOffset:{width:1,height:1},
+      textShadowRadius:5,
+      paddingLeft:10,
+
+    },
+    text_pos:{
+      fontSize:15,
+      color:'white',
+      textShadowColor:'#585858',
+      textShadowOffset:{width:1,height:1},
+      textShadowRadius:5,
+      paddingLeft:10,
+
+    },
+    image:{
+      width:50,
+      height:50,
+      borderRadius:5
+    },
     input: {
       height: 40,
       margin: 12,
@@ -24,6 +69,12 @@ export const styles = StyleSheet.create({
       justifyContent:'center',
       gap:10,
       marginBottom:15
+    },
+    error:{
+      color:'red'
+    },
+    right:{
+      display:'none'
     },
     fecha:{
       margin: 12,
@@ -48,10 +99,7 @@ export const styles = StyleSheet.create({
       fontWeight: 'bold',
       color: 'white',
     },
-    error:{
-      color:'red'
-    },
-    right:{
-      display:'none'
-    },
-  });
+  }); 
+
+
+
