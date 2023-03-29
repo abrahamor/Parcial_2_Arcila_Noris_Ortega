@@ -48,4 +48,10 @@ export const styles = StyleSheet.create({
       fontWeight: 'bold',
       color: 'white',
     },
+    error:{
+      color:'red'
+    },
+    right:{
+      display:'none'
+    },
   });

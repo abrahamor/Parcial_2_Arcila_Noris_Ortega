@@ -1,20 +1,23 @@
-import React,{ useState } from 'react'
-import { Text, Button, TextInput, View,ScrollView, Platform, TouchableOpacity } from 'react-native';
+import React,{useContext, useEffect, useReducer, useState} from 'react'
+import { Text, Button, TextInput, StyleSheet, View, ImageBackground, ScrollView, Platform, TouchableOpacity } from 'react-native';
+import useForm from '../hooks/useForm';
+import { EmployeeContext, EmployeeContextData, initialState } from '../imports/employeeContext';
 import { SelectList } from 'react-native-dropdown-select-list'
 import { styles } from '../styles/style';
 import DatePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 
-import { EmployeeContext, EmployeeContextData, initialState } from '../imports/employeeContext';
-
-import useForm from '../hooks/useForm';
+import { useChangeState } from '../hooks/useChangeState';
+import { authReducer, initialStateLock, LoginPayload } from '../imports/reduce';
 
 
 const Main = () => {
 
   const [employee, handleChange] = useForm(initialState);
+  const {lock,handleChangeLock,handleChangeUnlock} = useChangeState()
 
 
+  const default_image = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png'
   const contextData:EmployeeContextData={
     data: employee,
     handleChange
@@ -29,12 +32,22 @@ const Main = () => {
       {key: 5, value: 'Lider de Proyecto'},
   ];
 
+  const [{loading,estado,token}, dispatch] = useReducer(authReducer, initialStateLock)
   const [show,setShow] = useState(false);
+  const [errors,setErrors] = useState(false);
   const [date, setDate] = useState(new Date());
   const [mode,setMode] = useState('date');
   const [fecha,setFecha] = useState('Fecha de nacimiento');
   const [image, setImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png');
-  
+
+  const [nombre, setNombre] = useState('');
+  const [cargo, setCargo] = useState('');
+  const [cel, setCel] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [img,setImg] = useState('');
+  const [fecha_stat,setFechastat] = useState('');
+  const [message,setMessage] = useState('');
+
   const onChange = (event: any,selectedDate: any) =>{
     const currentDate = selectedDate || date;
     setShow(Platform.OS  === 'ios');
@@ -48,6 +61,44 @@ const Main = () => {
   const showMode = (currentMode:any) => {
     setShow(true);
     setMode(currentMode);
+  }
+
+  const login = (state:any) => {
+          if(state == 'lock'){
+            handleChangeUnlock(false)
+            if(userName == '' || email == '' || telefono == '' || puesto == 0 || fecha == '' || image == default_image){
+              setNombre('');
+              setCorreo('');
+              setCel('');
+              setCargo('');
+              setImg(default_image)
+              setFechastat('');
+              setErrors(true)
+            }else{
+              setNombre(userName);
+              setCorreo(email);
+              setCel(telefono);
+              setImg(image)
+              setFechastat(fecha);
+              setErrors(false)
+              setMessage('La información se guardó con exito')
+              setTimeout(()=> setMessage('') ,3000);
+
+              if(puesto == ''){
+                setCargo('')
+              }else{
+                setCargo(puesto)
+              }
+            }
+        }
+        if(state == 'unlock'){
+            handleChangeLock(false)
+        }
+      
+      const payload:LoginPayload = {
+          estado:state
+      }
+      dispatch({type:state,payload})
   }
 
   const pickImage = async () => {
@@ -74,6 +125,7 @@ const Main = () => {
             value={userName}
             onChangeText={(value: string) => handleChange('userName', value)}
           />
+          <Text style={userName == '' ? styles.error : styles.right}>El nombre no puede estar vacio</Text>
 
           <Text>Fecha de nacimiento</Text>
           <View style={styles.fecha}>
@@ -94,6 +146,7 @@ const Main = () => {
             onChange={onChange}
           />}
       
+          <Text style={fecha == 'Fecha de nacimiento' ? styles.error : styles.right}>La fecha no puede estar vacia</Text>
 
           <Text>Puesto</Text>
           <SelectList 
@@ -102,6 +155,7 @@ const Main = () => {
             save='value'
             boxStyles={{margin: 12}}
           />
+          <Text style={puesto == 0 ? styles.error : styles.right}>Seleccione alguna opción</Text>
 
           <Text>Email</Text>
           <TextInput
@@ -110,6 +164,7 @@ const Main = () => {
             value={email}
             onChangeText={(value: string) => handleChange('email', value)}
           />
+          <Text style={email == '' ? styles.error : styles.right}>El correo no puede estar vacio</Text>
 
           <Text >Teléfono</Text>
           <TextInput
@@ -118,19 +173,24 @@ const Main = () => {
             value={telefono}
             onChangeText={(value: string) => handleChange('telefono', value)}
           />
+          <Text style={telefono == '' ? styles.error : styles.right}>El telefono no puede estar vacio</Text>
             
           <TouchableOpacity style={styles.panelButton} onPress={pickImage}>
             <Text style={styles.panelButtonTitle} >Escoge foto de perfil</Text>
           </TouchableOpacity>
+          <Text style={image == default_image ? styles.error : styles.right}>Escoja una foto de perfil</Text>
        
           <View style={styles.buttons}>
            
 
-            <Button title='Bloquear'/>
-            <Button title='Desbloquear'/>
+            <Button title='Bloquear' onPress={()=>{login('lock'); handleChangeLock(true)}}/>
+            <Button title='Desbloquear' onPress={()=>{login('unlock'); handleChangeUnlock(true)}}/>
           </View>
-
-  
+          {errors   && !token  && <Text style={styles.error}>No es posible generar la tarjeta, hay errores en el formulario</Text>}
+          {loading  && !token  && <Text>Estado: desbloqueado</Text>}
+          {!loading && !errors && !token && <Text style={{color:'green'}}>{message}</Text>}
+          {!loading && !errors && !token && <Text>Estado: bloqueado</Text>}
+          {!loading && token   && <Text>Estado: desbloqueado</Text>}
         </View> 
       </ScrollView>
     </EmployeeContext.Provider>
